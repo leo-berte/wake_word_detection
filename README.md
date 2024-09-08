@@ -24,7 +24,9 @@ The directories contain:
 - originals: positive words "Hey Argo" and negative words (random words or background noise).
 - augemented: takes the file in "originals" and augment them with pitch shifting and audio stretching.
 
-# models: weights of the NN trained on different datasets (augmented vs orginals) and different architectures (RNN, GRU, LSTM)
+# models: 
+
+weights of the NN trained on different datasets (augmented vs orginals) and different architectures (RNN, GRU, LSTM)
 
 ===============================
 
