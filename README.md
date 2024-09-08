@@ -32,7 +32,7 @@ weights of the NN trained on different datasets (augmented vs orginals) and diff
 
 - wake_word_live.py: keep the audio stream for N seconds and in the meanwhile it prints "hey Argo detected" or "random word" anytime it hears someone speaking.
 - build_dataset.py: create a dataset by recording both positive words ("hey Argo") and negative words (random words or background noise).
-- 
+
 ===============================
 
 Argo website: argorobot.it
