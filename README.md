@@ -7,8 +7,6 @@ Performed audio post-processing, NN architecture definition, training, hyper-par
 
 ===============================
 
-The directories contain:
-
 # code: 
 
 - build_dataset.py: code used to create the dataset and augment (eventually) the dataset.
