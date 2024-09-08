@@ -9,7 +9,7 @@ import torch
 
 
 # define different NN architectures
-NN_MODEL_TYPE = "gru" # "rnn" - "gru" - "lstm"
+NN_MODEL_TYPE = "gru_advanced" # "rnn" - "gru" - "gru_advanced" - lstm"
 
 
 if NN_MODEL_TYPE == "rnn":
@@ -53,6 +53,7 @@ if NN_MODEL_TYPE == "rnn":
 elif NN_MODEL_TYPE == "gru":
 
     class GRUModel(nn.Module):
+        
         def __init__(self, input_size, hidden_size, output_size, num_layers):
             super(GRUModel, self).__init__()
             self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
@@ -65,7 +66,7 @@ elif NN_MODEL_TYPE == "gru":
         
     # net hyperparameters
     batch_size=32
-    epochs=2
+    epochs=100
     learning_rate=0.0001   
     
     # example_spectrogram, _ = next(iter(train_dl))
@@ -84,64 +85,72 @@ elif NN_MODEL_TYPE == "gru":
 
 
 
+elif NN_MODEL_TYPE == "gru_advanced":  
+      
+    class GRUAdvancedModel(nn.Module):
+        
+        def __init__(self, input_size, hidden_size, output_size, num_layers, dropout_prob):
+            super(GRUAdvancedModel, self).__init__()
+            
+            # First GRU layer
+            self.gru1 = nn.GRU(input_size, hidden_size, num_layers=1, batch_first=True)
+            self.dropout1 = nn.Dropout(dropout_prob)  
+            self.batch_norm1 = nn.BatchNorm1d(hidden_size)  
+            
+            # Second GRU layer
+            self.gru2 = nn.GRU(hidden_size, hidden_size, num_layers=1, batch_first=True)
+            self.dropout2 = nn.Dropout(dropout_prob)  
+            self.batch_norm2 = nn.BatchNorm1d(hidden_size)  
+    
+            # Fnal dropout
+            self.dropout_final = nn.Dropout(dropout_prob)
+            
+            # Fully connected layer 
+            self.fc = nn.Linear(hidden_size, output_size)
+            
+            
+        def forward(self, x):
+            
+            # First GRU
+            out, _ = self.gru1(x)
+            # dropout e batch norm
+            out = self.dropout1(out)
+            out = self.batch_norm1(out.transpose(1, 2)).transpose(1, 2) # batch_norm needs this format: [batch_size, hidden_size, time_steps]
+            
+            # Second GRU
+            out, _ = self.gru2(out)
+            # dropout e batch norm
+            out = self.dropout2(out)
+            out = self.batch_norm2(out.transpose(1, 2)).transpose(1, 2) # batch_norm needs this format: [batch_size, hidden_size, time_steps]
+            
+            # final dropout
+            out = self.dropout_final(out)
+            
+            # fully connected layer
+            out = self.fc(out[:, -1, :])  # FC applied oly to the final time step
+            
+            return out
+    
 
-# class GRUModel(nn.Module):
-#     def __init__(self, input_size, Tx, hidden_size, output_size):
-#         super(GRUModel, self).__init__()
-        
-#         # Convolutional layer
-#         self.conv1d = nn.Conv1d(in_channels=Tx, out_channels=196, kernel_size=15, stride=4)
-#         self.batch_norm1 = nn.BatchNorm1d(196)
-#         self.dropout1 = nn.Dropout(0.8)
-        
-#         # First GRU layer
-#         self.gru1 = nn.GRU(input_size, hidden_size, batch_first=True, bidirectional=False)
-#         self.dropout2 = nn.Dropout(0.8)
-#         self.batch_norm2 = nn.BatchNorm1d(Tx)
-        
-#         # Second GRU layer
-#         self.gru2 = nn.GRU(input_size, hidden_size, batch_first=True, bidirectional=False)
-#         self.dropout3 = nn.Dropout(0.8)
-#         self.batch_norm3 = nn.BatchNorm1d(Tx)
-        
-#         self.fc = nn.Linear(hidden_size, output_size)
-
-#     def forward(self, x):
-#         # Convolutional layer
-#         x = self.conv1d(x)
-#         x = self.batch_norm1(x)
-#         x = F.relu(x)
-#         x = self.dropout1(x)
-        
-#         # First GRU layer
-#         x, _ = self.gru1(x.permute(0, 2, 1))
-#         x = self.dropout2(x)
-#         x = self.batch_norm2(x)
-        
-#         # Second GRU layer
-#         x, _ = self.gru2(x)
-#         x = self.dropout3(x)
-#         x = self.batch_norm3(x)
-        
-#         out = self.fc(x[:, -1, :])
-
-#         return out
-
+    # net hyperparameters
+    batch_size=32
+    epochs=100
+    learning_rate=0.0001   
+    dropout_prob=0.8
+    
+    # example_spectrogram, _ = next(iter(train_dl))
+    input_size = 64 # example_spectrogram.shape[2]  # n_mels --> defined in "dataset_processing.py
+    hidden_size = 256*2
+    output_size = 1  # Output size for binary classification
+    num_layers = 1
+    model = GRUAdvancedModel(input_size, hidden_size, output_size, num_layers, dropout_prob)
+    
+    # Using BCEWithLogitsLoss instead of CrossEntropyLoss
+    criterion = nn.BCEWithLogitsLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
     
     
-# # net hyperparameters
-
-# batch_size=32
-# epochs=70
-# learning_rate=0.0001   
-
-# # example_spectrogram, _ = next(iter(train_dl))
-# input_size = 64 # example_spectrogram.shape[2]  # n_mels --> defined in "dataset_processing.py
-# hidden_size = 256*2
-# output_size = 1  # Output size for binary classification
-# Tx = 93
-# model = GRUModel(input_size, Tx, hidden_size, output_size)
-
-# # Using BCEWithLogitsLoss instead of CrossEntropyLoss
-# criterion = nn.BCEWithLogitsLoss()
-# optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
+    
+elif NN_MODEL_TYPE == "lstm":
+    
+    pass

@@ -13,7 +13,7 @@ from queue import Queue
 # custom libraries
 from audio_processing_lib import *
 from dataset_processing_lib import *
-from rnn_architecture import *
+from nn_architecture import *
 from wake_word_eval import *
 
 

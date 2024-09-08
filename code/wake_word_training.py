@@ -3,18 +3,26 @@
 # ----------------------------------------
 # 
 # Explain spectrogram: https://towardsdatascience.com/audio-deep-learning-made-simple-part-2-why-mel-spectrograms-perform-better-aad889a93505
-# LSTM model: https://github.com/va-kiet/Voice-Assistant-wake-word-detection-model/blob/main/AI-Voice-Assistant/wakeword/neuralnet/model.py
-# GRU model: https://github.com/shivammalviya712/Trigger-Word-Detection/blob/master/code/model.py
-# GRU (entire coursera example): https://github.com/shenweichen/Coursera/blob/master/Specialization_Deep_Learning_deeplearning.ai/Course5_Sequence%20Models/week3_Sequence%20models%20%26%20Attention%20mechanism/Trigger%2Bword%2Bdetection%2B-%2Bv1.ipynb
+# RNN model: https://pytorch.org/docs/stable/generated/torch.nn.RNN.html#torch.nn.RNN
+# GRU model: https://pytorch.org/docs/stable/generated/torch.nn.GRU.html
+# GRU CODE: https://github.com/JamesMcGuigan/coursera-deeplearning-specialization/blob/master/05_Sequence_Models/Week%203/Trigger%20word%20detection/Trigger_word_detection_v1a.ipynb
+# LSTM model: https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
+# LSTM CODE: https://github.com/va-kiet/Voice-Assistant-wake-word-detection-model/blob/main/AI-Voice-Assistant/wakeword/neuralnet/model.py
 # 
 # ----------------------------------------
+
+
+# NOTES:
+# Come faccio training e tuning? ciclo for in cui vario n_layers, batch_size, lr e cos'altro?
+# per ogni ciclo, che metriche salvo per fare poi confronti? validation loss, accuracy, grafici, ...?
+
 
 
 import matplotlib.pyplot as plt
 
 # custom libraries
 from dataset_processing_lib import *
-from rnn_architecture import *
+from nn_architecture import *
 
 
 def train_model(train_dl, val_dl):
@@ -65,9 +73,6 @@ def train_model(train_dl, val_dl):
         valid_loss_values.append(valid_average_loss)
         print(f'Epoch [{epoch+1}/{epochs}], Loss: {average_loss:.4f}')
         
-    # Save the model
-    torch.save(model.state_dict(), 'models/wake_word_model.pth')
-
     # Plot loss
     plt.plot(range(1, epochs + 1), train_loss_values, marker='o')
     plt.title('Training Loss')
@@ -136,7 +141,7 @@ if __name__ == '__main__':
     
     # use the original dataset or the augmented dataset
     dataset_choice = 'augmented' # 'augmented' 'originals'
-    dataset_path = os.path.join('dataset', dataset_choice)
+    dataset_path = os.path.join('../dataset', dataset_choice)
     
     # get the training set and validation set
     dataset_dl, train_dl, val_dl = get_datasets(dataset_path) 
@@ -157,7 +162,7 @@ if __name__ == '__main__':
     
     # Save the model
     model_data = f'{NN_MODEL_TYPE}_{dataset_choice}_{valid_average_loss:.2f}_{accuracy:.2f}_{batch_size}_{epochs}_{hidden_size}_{num_layers}_{learning_rate}.pth' 
-    model_data_name = os.path.join('models', model_data)
+    model_data_name = os.path.join('../models', model_data)
     torch.save(model.state_dict(), model_data_name)
     
     

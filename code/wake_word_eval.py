@@ -10,11 +10,11 @@ import torch
 
 # custom libraries
 from audio_processing_lib import *
-from rnn_architecture import *
+from nn_architecture import *
 
     
 # load the model
-model.load_state_dict(torch.load('models/wake_word_gru_0.04_0.95_32_50_512_1_0.0001.pth'))
+model.load_state_dict(torch.load('../models/wake_word_gru_0.04_0.95_32_50_512_1_0.0001.pth'))
 model.eval()
     
     
@@ -44,7 +44,7 @@ TEST_EVAL_FLAG = False # True - False
 if (TEST_EVAL_FLAG == True):
     
     # give a name to the test audio file
-    test_audio_filename = os.path.join('dataset', 'test_audio.wav') # "chunk_9.wav" 
+    test_audio_filename = os.path.join('../dataset', 'test_audio.wav') 
     
     # Record the audio
     record_audio(test_audio_filename)

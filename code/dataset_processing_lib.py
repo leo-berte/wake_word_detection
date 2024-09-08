@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, Dataset, random_split
 
 # custom libraries
 from audio_processing_lib import *
-from rnn_architecture import *
+from nn_architecture import *
 
 
 def collect_dataset(flag_wake_word, samples_per_class, wake_word, output_dir):
