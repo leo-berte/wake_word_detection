@@ -9,8 +9,15 @@ import torch.quantization as quantization
 import torch
 
 
+
+# TODO: 
+# 1) Fix QAT
+# 2) Add device CPU or CUDA automatically, maybe with global flag
+
+
+
 # quantization settings
-QUANTIZATION_AWARE_TRAINING_FLAG = True # True - False
+QUANTIZATION_AWARE_TRAINING_FLAG = False # True - False
 
 # Quantization: convert the weights and activations in int8 instead of float32,
 # so that the inference is faster on embedded devices. 
@@ -29,7 +36,7 @@ def convert_to_quantized(model):
 
 
 # define different NN architectures
-NN_MODEL_TYPE = "gru" # "rnn" - "gru" - "gru_advanced" - lstm"
+NN_MODEL_TYPE = "lstm" # "rnn" - "gru" - "gru_advanced" - lstm"
 
 
 if NN_MODEL_TYPE == "rnn":
@@ -206,7 +213,53 @@ elif NN_MODEL_TYPE == "gru_advanced":
     
     
 elif NN_MODEL_TYPE == "lstm":
+
+    class LSTMModel(nn.Module):
+        
+        def __init__(self, input_size, hidden_size, output_size, num_layers):
+            super(LSTMModel, self).__init__()
+            
+            self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+            self.fc = nn.Linear(hidden_size, output_size)
+            
+            # add quantization steps
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                self.quant = quantization.QuantStub()
+                self.dequant = quantization.DeQuantStub()
+        
+        
+        def forward(self, x):
+            
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                x = self.quant(x)
+                
+            out, _ = self.lstm(x)
+            out = self.fc(out[:, -1, :])
+            
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                out = self.dequant(out)
+            
+            return out
+        
+        
+    # net hyperparameters
+    batch_size = 32
+    epochs = 100
+    learning_rate = 0.0001
     
-    pass
+    # example_spectrogram, _ = next(iter(train_dl))
+    input_size = 64 # example_spectrogram.shape[2]  # n_mels --> defined in "dataset_processing.py
+    hidden_size = 256 * 2
+    output_size = 1  # Output size for binary classification
+    num_layers = 1
+    model = LSTMModel(input_size, hidden_size, output_size, num_layers)
+    
+    if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+        model = prepare_for_qat(model)
+        
+    # Using BCEWithLogitsLoss instead of CrossEntropyLoss
+    criterion = nn.BCEWithLogitsLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
+
 
 
