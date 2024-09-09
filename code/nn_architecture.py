@@ -10,9 +10,7 @@ import torch
 
 
 
-# TODO: 
-# 1) Fix QAT
-# 2) Add device CPU or CUDA automatically, maybe with global flag
+# TODO: fix QAT
 
 
 
@@ -33,7 +31,8 @@ def convert_to_quantized(model):
     model = quantization.convert(model, inplace=True)
     return model
 
-
+# global device flag
+DEVICE_FLAG = "cuda" if torch.cuda.is_available() else "cpu"  # automatically choose 'cuda' if available, otherwise 'cpu'
 
 # define different NN architectures
 NN_MODEL_TYPE = "lstm" # "rnn" - "gru" - "gru_advanced" - lstm"
@@ -71,6 +70,7 @@ if NN_MODEL_TYPE == "rnn":
     output_size = 1  # Output size for binary classification
     num_layers = 2
     model = RNNModel(input_size, hidden_size, output_size, num_layers)
+    model = model.to(DEVICE_FLAG) # move model to the selected device (CPU or CUDA)
     
     # Using BCEWithLogitsLoss instead of CrossEntropyLoss
     criterion = nn.BCEWithLogitsLoss()
@@ -121,6 +121,9 @@ elif NN_MODEL_TYPE == "gru":
     
     if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
         model = prepare_for_qat(model)
+        
+    # move model to the selected device (CPU or CUDA)
+    model = model.to(DEVICE_FLAG)
         
     # Using BCEWithLogitsLoss instead of CrossEntropyLoss
     criterion = nn.BCEWithLogitsLoss()
@@ -206,6 +209,9 @@ elif NN_MODEL_TYPE == "gru_advanced":
     if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
         model = prepare_for_qat(model)
     
+    # move model to the selected device (CPU or CUDA)
+    model = model.to(DEVICE_FLAG)
+    
     # Using BCEWithLogitsLoss instead of CrossEntropyLoss
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
@@ -244,7 +250,7 @@ elif NN_MODEL_TYPE == "lstm":
         
     # net hyperparameters
     batch_size = 32
-    epochs = 100
+    epochs = 50
     learning_rate = 0.0001
     
     # example_spectrogram, _ = next(iter(train_dl))
@@ -256,7 +262,10 @@ elif NN_MODEL_TYPE == "lstm":
     
     if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
         model = prepare_for_qat(model)
-        
+    
+    # move model to the selected device (CPU or CUDA)
+    model = model.to(DEVICE_FLAG)
+    
     # Using BCEWithLogitsLoss instead of CrossEntropyLoss
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)

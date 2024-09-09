@@ -7,8 +7,7 @@
 # GRU model: https://pytorch.org/docs/stable/generated/torch.nn.GRU.html
 # GRU CODE: https://github.com/JamesMcGuigan/coursera-deeplearning-specialization/blob/master/05_Sequence_Models/Week%203/Trigger%20word%20detection/Trigger_word_detection_v1a.ipynb
 # LSTM model: https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
-# LSTM CODE: https://github.com/va-kiet/Voice-Assistant-wake-word-detection-model/blob/main/AI-Voice-Assistant/wakeword/neuralnet/model.py
-# 
+#
 # ----------------------------------------
 
 
@@ -40,10 +39,10 @@ def train_model(train_dl, val_dl):
         for i, (inputs, labels) in enumerate(train_dl):
             
             # labels = labels.float().unsqueeze(1) # equivalent to view(-1,1)
-            labels = labels.float().view(-1, 1)  # batch_size, 1            
+            labels = labels.float().view(-1, 1).to(DEVICE_FLAG)  # batch_size, 1            
             
             # Ensure spectrograms have the correct shape for NN
-            inputs = inputs.squeeze(1).permute(0, 2, 1)  # from [batch_size, 1, n_mels, time_steps] to [batch_size, time_steps, n_mels]
+            inputs = inputs.squeeze(1).permute(0, 2, 1).to(DEVICE_FLAG)  # from [batch_size, 1, n_mels, time_steps] to [batch_size, time_steps, n_mels]
             
             # inference
             outputs = model(inputs)
@@ -65,8 +64,8 @@ def train_model(train_dl, val_dl):
         valid_loss = 0
         with torch.no_grad():
             for inputs, labels in val_dl:
-                labels = labels.float().view(-1, 1)
-                inputs = inputs.squeeze(1).permute(0, 2, 1)
+                labels = labels.float().view(-1, 1).to(DEVICE_FLAG)
+                inputs = inputs.squeeze(1).permute(0, 2, 1).to(DEVICE_FLAG)
                 outputs = model(inputs)
                 loss = criterion(outputs, labels)
                 valid_loss += loss.item()
@@ -106,8 +105,8 @@ def eval_model(val_dl):
 
     with torch.no_grad():
         for inputs, labels in val_dl:
-            labels = labels.float().view(-1, 1)
-            inputs = inputs.squeeze(1).permute(0, 2, 1)
+            labels = labels.float().view(-1, 1).to(DEVICE_FLAG)
+            inputs = inputs.squeeze(1).permute(0, 2, 1).to(DEVICE_FLAG)
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             valid_loss += loss.item()
@@ -119,8 +118,8 @@ def eval_model(val_dl):
             print("len: ", len(val_dl))
             
             # Store labels and predictions for metric calculation
-            all_labels.extend(labels.numpy())
-            all_predictions.extend(predicted_labels.numpy())
+            all_labels.extend(labels.cpu().numpy()) # move back to CPU before converting to NumPy
+            all_predictions.extend(predicted_labels.cpu().numpy()) # move back to CPU before converting to NumPy
     
     valid_average_loss = valid_loss / len(val_dl)
 
@@ -142,7 +141,7 @@ def eval_model(val_dl):
 if __name__ == '__main__':
     
     # use the original dataset or the augmented dataset
-    dataset_choice = 'augmented' # 'augmented' 'originals'
+    dataset_choice = 'originals' # 'augmented' 'originals'
     dataset_path = os.path.join('../dataset', dataset_choice)
     
     # get the training set and validation set

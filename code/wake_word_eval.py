@@ -29,7 +29,7 @@ def eval_model(sgram):
     
     with torch.no_grad():
 
-        input_sgram = sgram.squeeze(1).permute(0, 2, 1)
+        input_sgram = sgram.squeeze(1).permute(0, 2, 1).to(DEVICE_FLAG)
         # print("input_audio_nn_shape in eval code: ", input_sgram.shape)
         output = model(input_sgram)
         

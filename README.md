@@ -16,6 +16,7 @@ Performed audio post-processing, NN architecture definition, training, hyper-par
 - wake_word_training.py: code for training.
 - wake_word_eval.py: code for running inference over a singli input audio file.
 - wake_word_live.py: code for recording audio live and print the wake word when it is detected.
+- dynamic_quantization.py: code for applying dynamic quantization to the saved model (model_weights.ph), so as to have faster and lighter inference on embedded devices.
 
 # dataset: 
 

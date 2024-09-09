@@ -19,5 +19,5 @@ quantized_model = torch.quantization.quantize_dynamic(
     dtype=torch.qint8  # type of quantization (int8)
 )
 
-# save the final model with quantization
+# save the final model with quantization (hopefully lighter and faster)
 torch.save(quantized_model, 'quantized_model.pt')
