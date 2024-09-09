@@ -33,8 +33,10 @@ def train_model(train_dl, val_dl):
 
     # Training loop
     for epoch in range(epochs):
+        
         model.train()
         epoch_loss = 0
+        
         for i, (inputs, labels) in enumerate(train_dl):
             
             # labels = labels.float().unsqueeze(1) # equivalent to view(-1,1)
@@ -151,14 +153,19 @@ if __name__ == '__main__':
     #     data, labels = batch
     #     print(f"Batch {i+1}: Dati shape {data.shape}, Labels shape {labels.shape}")
         
-    # # load previous weights (but nn archtecture must be the same)
-    # model.load_state_dict(torch.load('wake_word_model_0.34_0.85_32_120_512_0.00005.pth'))
-    
     # train the model
     train_model(train_dl, val_dl)    
     
     # eval the model on validation set
     valid_average_loss, accuracy, precision, recall, f1 = eval_model(val_dl)
+    
+    # Convert the model to quantized version
+    if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+        model = convert_to_quantized(model)
+    
+    # it is good to re-evaluate the quantization model on the validation set
+    if QUANTIZATION_AWARE_TRAINING_FLAG == True:
+        valid_average_loss_quant, accuracy_quant, precision_quant, recall_quant, f1_quant = eval_model(val_dl)
     
     # Save the model
     model_data = f'{NN_MODEL_TYPE}_{dataset_choice}_{valid_average_loss:.2f}_{accuracy:.2f}_{batch_size}_{epochs}_{hidden_size}_{num_layers}_{learning_rate}.pth' 

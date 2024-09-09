@@ -5,11 +5,31 @@
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import torch.quantization as quantization
 import torch
 
 
+# quantization settings
+QUANTIZATION_AWARE_TRAINING_FLAG = True # True - False
+
+# Quantization: convert the weights and activations in int8 instead of float32,
+# so that the inference is faster on embedded devices. 
+
+def prepare_for_qat(model):
+    model.qconfig = quantization.get_default_qat_qconfig('fbgemm')
+    model = quantization.prepare_qat(model, inplace=True)
+    return model
+
+
+def convert_to_quantized(model):
+    model.eval()
+    model = quantization.convert(model, inplace=True)
+    return model
+
+
+
 # define different NN architectures
-NN_MODEL_TYPE = "gru_advanced" # "rnn" - "gru" - "gru_advanced" - lstm"
+NN_MODEL_TYPE = "gru" # "rnn" - "gru" - "gru_advanced" - lstm"
 
 
 if NN_MODEL_TYPE == "rnn":
@@ -20,6 +40,7 @@ if NN_MODEL_TYPE == "rnn":
             super(RNNModel, self).__init__()
             self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True) 
             self.fc = nn.Linear(hidden_size, output_size)
+        
         
         def forward(self, x):
             # input: batch_size, sequence_length, features --> output: batch_size, sequence_length, hidden_size
@@ -58,11 +79,26 @@ elif NN_MODEL_TYPE == "gru":
             super(GRUModel, self).__init__()
             self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
             self.fc = nn.Linear(hidden_size, output_size)
+            
+            # add quantization steps
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                self.quant = quantization.QuantStub()
+                self.dequant = quantization.DeQuantStub()
+        
         
         def forward(self, x):
+            
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                x = self.quant(x)
+                
             out, _ = self.gru(x)
             out = self.fc(out[:, -1, :])
+            
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                out = self.dequant(out)
+            
             return out
+        
         
     # net hyperparameters
     batch_size=32
@@ -76,6 +112,9 @@ elif NN_MODEL_TYPE == "gru":
     num_layers = 1
     model = GRUModel(input_size, hidden_size, output_size, num_layers)
     
+    if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+        model = prepare_for_qat(model)
+        
     # Using BCEWithLogitsLoss instead of CrossEntropyLoss
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
@@ -108,9 +147,17 @@ elif NN_MODEL_TYPE == "gru_advanced":
             # Fully connected layer 
             self.fc = nn.Linear(hidden_size, output_size)
             
+            # add quantization steps
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                self.quant = quantization.QuantStub()
+                self.dequant = quantization.DeQuantStub()
+            
             
         def forward(self, x):
             
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                x = self.quant(x)
+                
             # First GRU
             out, _ = self.gru1(x)
             # dropout e batch norm
@@ -129,12 +176,16 @@ elif NN_MODEL_TYPE == "gru_advanced":
             # fully connected layer
             out = self.fc(out[:, -1, :])  # FC applied oly to the final time step
             
-            return out
+            if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+                out = self.dequant(out)
+            
+            return out 
+    
     
 
     # net hyperparameters
     batch_size=32
-    epochs=100
+    epochs=2
     learning_rate=0.0001   
     dropout_prob=0.8
     
@@ -145,6 +196,9 @@ elif NN_MODEL_TYPE == "gru_advanced":
     num_layers = 1
     model = GRUAdvancedModel(input_size, hidden_size, output_size, num_layers, dropout_prob)
     
+    if (QUANTIZATION_AWARE_TRAINING_FLAG == True):
+        model = prepare_for_qat(model)
+    
     # Using BCEWithLogitsLoss instead of CrossEntropyLoss
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
@@ -154,3 +208,5 @@ elif NN_MODEL_TYPE == "gru_advanced":
 elif NN_MODEL_TYPE == "lstm":
     
     pass
+
+

@@ -14,7 +14,7 @@ from nn_architecture import *
 
     
 # load the model
-model.load_state_dict(torch.load('../models/wake_word_gru_0.04_0.95_32_50_512_1_0.0001.pth'))
+model.load_state_dict(torch.load('../models/gru_augmented_0.04_0.95_32_50_512_1_0.0001.pth'))
 model.eval()
     
     
