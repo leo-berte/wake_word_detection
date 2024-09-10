@@ -22,8 +22,8 @@ from dataset_processing_lib import *
 if __name__ == '__main__':
     
     # flags
-    flag_augment_dataset = False # True False
-    flag_collect_dataset = True # True False
+    flag_augment_dataset = True # True False
+    flag_collect_dataset = False # True False
     flag_wake_word = "negative"  # negative: collect negative samples - positive: collect positive samples
     
     # paramas
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     collect_output_dir='../dataset/originals'
     augment_input_dir='../dataset/originals'
     augment_output_dir='../dataset/augmented'
-    samples_per_class = 20
+    samples_per_class = 30
 
     # Collect the original dataset
     if flag_collect_dataset == True:

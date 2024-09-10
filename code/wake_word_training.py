@@ -141,7 +141,7 @@ def eval_model(val_dl):
 if __name__ == '__main__':
     
     # use the original dataset or the augmented dataset
-    dataset_choice = 'originals' # 'augmented' 'originals'
+    dataset_choice = 'augmented' # 'augmented' 'originals'
     dataset_path = os.path.join('../dataset', dataset_choice)
     
     # get the training set and validation set

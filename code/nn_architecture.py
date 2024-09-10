@@ -31,6 +31,7 @@ def convert_to_quantized(model):
     model = quantization.convert(model, inplace=True)
     return model
 
+
 # global device flag
 DEVICE_FLAG = "cuda" if torch.cuda.is_available() else "cpu"  # automatically choose 'cuda' if available, otherwise 'cpu'
 
