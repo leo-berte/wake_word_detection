@@ -21,7 +21,7 @@ elif NN_MODEL_TYPE == "gru_advanced":
 elif NN_MODEL_TYPE == "lstm":
     model.load_state_dict(torch.load('../models/lstm_augmented_0.17_0.93_32_100_512_1_0.0001.pth'))
 elif NN_MODEL_TYPE == "transformer":
-    model.load_state_dict(torch.load('../models/transformer_augmented_0.18_0.95_32_50_256_2_4_0.0001.pth'))
+    model.load_state_dict(torch.load('../models/transformer_augmented_0.05_0.98_32_50_256_2_8_0.0001.pth'))
     
 # set to eval mode
 model.eval()

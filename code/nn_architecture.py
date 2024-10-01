@@ -10,7 +10,7 @@ import torch
 
 
 
-# TODO: fix QAT
+# TODO: QUANTIZATION_AWARE_TRAINING still to be fixed
 
 
 
@@ -36,7 +36,7 @@ def convert_to_quantized(model):
 DEVICE_FLAG = "cuda" if torch.cuda.is_available() else "cpu"  # automatically choose 'cuda' if available, otherwise 'cpu'
 
 # define different NN architectures
-NN_MODEL_TYPE = "transformer" # "rnn" - "gru" - "gru_advanced" - "lstm" - "transformer"
+NN_MODEL_TYPE = "gru" # "rnn" - "gru" - "gru_advanced" - "lstm" - "transformer"
                  
 
 if NN_MODEL_TYPE == "rnn":
@@ -307,7 +307,7 @@ elif NN_MODEL_TYPE == "transformer":
     hidden_size = 256
     output_size = 1  # Output size for binary classification
     num_layers = 2 # number of stacked encoders
-    nhead = 4  # number of heads
+    nhead = 8  # number of heads
     
     # define the model
     model = TransformerEncoderModel(input_size, hidden_size, num_layers, nhead, output_size).to(DEVICE_FLAG)
