@@ -167,7 +167,10 @@ if __name__ == '__main__':
         valid_average_loss_quant, accuracy_quant, precision_quant, recall_quant, f1_quant = eval_model(val_dl)
     
     # Save the model
-    model_data = f'{NN_MODEL_TYPE}_{dataset_choice}_{valid_average_loss:.2f}_{accuracy:.2f}_{batch_size}_{epochs}_{hidden_size}_{num_layers}_{learning_rate}.pth' 
+    if NN_MODEL_TYPE == "transformer":
+        model_data = f'{NN_MODEL_TYPE}_{dataset_choice}_{valid_average_loss:.2f}_{accuracy:.2f}_{batch_size}_{epochs}_{hidden_size}_{num_layers}_{nhead}_{learning_rate}.pth' 
+    else:
+        model_data = f'{NN_MODEL_TYPE}_{dataset_choice}_{valid_average_loss:.2f}_{accuracy:.2f}_{batch_size}_{epochs}_{hidden_size}_{num_layers}_{learning_rate}.pth' 
     model_data_name = os.path.join('../models', model_data)
     torch.save(model.state_dict(), model_data_name)
     

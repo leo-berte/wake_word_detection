@@ -36,8 +36,8 @@ def convert_to_quantized(model):
 DEVICE_FLAG = "cuda" if torch.cuda.is_available() else "cpu"  # automatically choose 'cuda' if available, otherwise 'cpu'
 
 # define different NN architectures
-NN_MODEL_TYPE = "lstm" # "rnn" - "gru" - "gru_advanced" - lstm"
-
+NN_MODEL_TYPE = "transformer" # "rnn" - "gru" - "gru_advanced" - "lstm" - "transformer"
+                 
 
 if NN_MODEL_TYPE == "rnn":
     
@@ -267,9 +267,57 @@ elif NN_MODEL_TYPE == "lstm":
     # move model to the selected device (CPU or CUDA)
     model = model.to(DEVICE_FLAG)
     
-    # Using BCEWithLogitsLoss instead of CrossEntropyLoss
+    # loss
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
 
 
 
+elif NN_MODEL_TYPE == "transformer":
+    
+    # NOTE: for wakeword I can just use encoder, since I do not have to generate anything as output with the decoder
+    
+    class TransformerEncoderModel(nn.Module):
+        def __init__(self, input_size, hidden_size, num_layers, nhead, output_size):
+            super(TransformerEncoderModel, self).__init__()
+    
+            self.embedding = nn.Linear(input_size, hidden_size)  # Layer di embedding
+            self.encoder_layers = nn.TransformerEncoderLayer(d_model=hidden_size, nhead=nhead)
+            self.transformer_encoder = nn.TransformerEncoder(self.encoder_layers, num_layers=num_layers)
+            self.fc = nn.Linear(hidden_size, output_size)  # Layer di output
+    
+    
+        def forward(self, x):
+            # x dovrebbe avere forma [batch_size, seq_length, input_size]
+            x = self.embedding(x)  # Passa attraverso il layer di embedding
+            x = x.permute(1, 0, 2)  # Cambia la forma in [seq_length, batch_size, hidden_size] per il Transformer
+            x = self.transformer_encoder(x)  # Passa attraverso il blocco encoder
+            x = x.mean(dim=0)  # Media delle sequenze (opzionale, puoi anche usare solo l'ultimo output)
+            x = self.fc(x)  # Passa attraverso il layer di output
+            return x
+    
+    
+    # net hyperparameters
+    batch_size = 32
+    epochs = 50
+    learning_rate = 0.0001
+    
+    # example_spectrogram, _ = next(iter(train_dl))
+    input_size = 64 # example_spectrogram.shape[2]  # n_mels --> defined in "dataset_processing.py
+    hidden_size = 256
+    output_size = 1  # Output size for binary classification
+    num_layers = 2 # number of stacked encoders
+    nhead = 4  # number of heads
+    
+    # define the model
+    model = TransformerEncoderModel(input_size, hidden_size, num_layers, nhead, output_size).to(DEVICE_FLAG)
+    
+    # move model to the selected device (CPU or CUDA)
+    model = model.to(DEVICE_FLAG)
+    
+    # loss
+    criterion = nn.BCEWithLogitsLoss()  
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
+    
+
+    
