@@ -243,18 +243,18 @@ r_t = \sigma(W_r x_t + U_r h_{t-1} + b_r)
 $$
 
 $$
-\tilde{h}_t = \tanh(W_h x_t + r_t \odot (U_h h_{t-1}) + b_h)
+h'_t = \tanh(W_h x_t + r_t \odot (U_h h_{t-1}) + b_h)
 $$
 
 $$
-h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t
+h_t = (1 - z_t) \odot h_{t-1} + z_t \odot h'_t
 $$
 
 Where:
 
 * $h_t$: Hidden state at time $t$ with dimensions $(sequence\_length \times hidden\_size)$
 * $x_t$: Input vector at time $t$ with dimensions $(sequence\_length \times input\_size)$
-* $\tilde{h}_t$: Candidate hidden state with dimensions $(sequence\_length \times hidden\_size)$
+* $h'_t$: Candidate hidden state with dimensions $(sequence\_length \times hidden\_size)$
 * $z_t$, $r_t$: Update and reset gates 
 * $W_z$, $W_r$, $W_h$: Weight matrices for input features
 * $U_z$, $U_r$, $U_h$: Weight matrices for hidden state
@@ -311,11 +311,11 @@ i_t = \sigma(W_i x_t + U_i h_{t-1} + b_i)
 $$
 
 $$
-\tilde{c}_t = \tanh(W_c x_t + U_c h_{t-1} + b_c)
+c'_t = \tanh(W_c x_t + U_c h_{t-1} + b_c)
 $$
 
 $$
-c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t
+c_t = f_t \odot c_{t-1} + i_t \odot c'_t
 $$
 
 $$
@@ -330,7 +330,7 @@ Where:
 
 * $h_t$: Hidden state at time $t$ with dimensions $(sequence\_length \times hidden\_size)$
 * $c_t$: Cell state at time $t$ with dimensions $(sequence\_length \times hidden\_size)$
-* $\tilde{c}_t$: Candidate cell state with dimensions $(sequence\_length \times hidden\_size)$
+* $c'_t$: Candidate cell state with dimensions $(sequence\_length \times hidden\_size)$
 * $x_t$: Input vector at time $t$ with dimensions $(sequence\_length \times input\_size)$
 * $f_t$, $i_t$, $o_t$: Forget, input and output gates with dimensions $(sequence\_length \times hidden\_size)$
 * $W_f$, $W_i$, $W_c$, $W_o$: Weight matrices for input features
