@@ -1,18 +1,15 @@
----
-title: "Wake-Word Detection for your AI robot: A Step-by-Step Guide"
-publishedAt: "2025-01-08"
-lastUpdatedAt: "2025-01-08"
-summary: "Learn how to build a wake-word detection system for your devices, exploiting NLP and AI. Understand the key concepts, training process and its application in robotics."
-tags: "NLP, AI, Language Processing, Robotics, Machine Learning, Wake-Word Detection"
-image: "/images/???????"
-readingTime: "20 minutes"
-codeRepo: "https://github.com/leo-berte/wake_word_detection"
----
-
-# Wake-Word Detection for your AI robot: A Step-by-Step Guide
+# Wake-Word Detection for your AI robot: Step-by-Step Guide
 In this guide, we will walk you through the process of building a wake word detection system for [Argo](https://argorobot.it/), an AI home robot. Along the way, we will also highlight the general pipeline used in AI projects, making this guide perfect for those new to Artificial Intelligence (AI), Natural Language Processing (NLP), or robotics.
 
-[![YouTube Video](https://img.youtube.com/vi/pKa5SEiUZ1g/0.jpg)](https://www.youtube.com/watch?v=pKa5SEiUZ1g)
+<Image
+    src="images\argo.JPG"
+    alt="argo"
+    width={800}
+    height={400}
+/>
+<Caption>
+    Watch the full video on [you-tube](https://www.youtube.com/watch?v=pKa5SEiUZ1g)!
+</Caption><br><br>
 
 Throughout the development, we’ll focus on the following stages:
 
@@ -173,7 +170,7 @@ We analyzed three main architectures: RNN, GRU, and LSTM. Below is a brief theor
 ### RNN (Recurrent Neural Network)
 
 <Image
-    src="images\rnn.png"
+    src="images\rnn.PNG"
     alt="rnn"
     width={800}
     height={400}
@@ -233,7 +230,7 @@ In classification tasks, instead of using the entire sequence of hidden states, 
 ### GRU (Gated Recurrent Unit)
 
 <Image
-    src="images\GRU.png"
+    src="images\GRU.PNG"
     alt="GRU"
     width={800}
     height={400}
@@ -301,7 +298,7 @@ model = GRUModel(input_size, hidden_size, output_size, num_layers)
 ### LSTM (Long Short-Term Memory)
 
 <Image
-    src="images\LSTM.png"
+    src="images\LSTM.PNG"
     alt="LSTM"
     width={800}
     height={400}
