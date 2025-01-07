@@ -1,8 +1,8 @@
-# Wake-Word Detection for your AI robot: Step-by-Step Guide
+# Wake-Word Detection for your robot: Step-by-Step Guide
 In this guide, we will walk you through the process of building a wake word detection system for [Argo](https://argorobot.it/), an AI home robot. Along the way, we will also highlight the general pipeline used in AI projects, making this guide perfect for those new to Artificial Intelligence (AI), Natural Language Processing (NLP), or robotics.
 
 <Image
-    src="images\argo.JPG"
+    src="images\argo.jpg"
     alt="argo"
     width={800}
     height={400}
