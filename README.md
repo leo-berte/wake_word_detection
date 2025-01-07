@@ -311,7 +311,7 @@ i_t = \sigma(W_i x_t + U_i h_{t-1} + b_i)
 $$
 
 $$
-\tilde{c}_t = \tanh(W_c x_t + U_c h_{t-1} + b_c)
+tilde{c}_t = \tanh(W_c x_t + U_c h_{t-1} + b_c)
 $$
 
 $$
